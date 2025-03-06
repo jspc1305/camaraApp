@@ -3,16 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Escáner de Códigos de Barras</title>
+  <title>TaskScan</title>
   <link rel="stylesheet" href="styles.css">
   <script src="https://unpkg.com/html5-qrcode" defer></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
   <script src="script.js" defer></script>
 </head>
 <body>
   <div class="container">
-    <h1>Escáner de Códigos de Barras</h1>
-    <div class="botones">
+    <!-- Menú Principal -->
+    <div id="menuPrincipal">
+      <h1>TaskScan</h1>
       <button id="crearLista">Crear Lista</button>
       <button id="actualizarEstatus">Actualizar Estatus</button>
       <button id="verTabla">Ver Tabla</button>
@@ -34,6 +35,7 @@
         </tbody>
       </table>
       <button id="guardarLista">Guardar Lista</button>
+      <button class="regresarMenu">Regresar al Menú</button>
     </div>
 
     <!-- Apartado para actualizar el estatus -->
@@ -41,6 +43,7 @@
       <h2>Actualizar Estatus</h2>
       <div id="scannerActualizarEstatus"></div>
       <div id="mensajeActualizarEstatus"></div>
+      <button class="regresarMenu">Regresar al Menú</button>
     </div>
 
     <!-- Apartado para ver la tabla -->
@@ -57,10 +60,8 @@
         <tbody>
         </tbody>
       </table>
-      <div class="botones">
-        <button id="exportarExcel">Exportar a Excel</button>
-        <button id="importarExcel">Importar desde Excel</button>
-      </div>
+      <button id="exportarPDF">Exportar a PDF</button>
+      <button class="regresarMenu">Regresar al Menú</button>
     </div>
 
     <!-- Audio de confirmación -->

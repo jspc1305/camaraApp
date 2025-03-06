@@ -24,8 +24,11 @@ document.getElementById('guardarLista').addEventListener('click', () => {
   mostrarMensaje('Lista guardada correctamente.', 'success');
 });
 
-document.getElementById('exportarExcel').addEventListener('click', exportarExcel);
-document.getElementById('importarExcel').addEventListener('click', importarExcel);
+document.getElementById('exportarPDF').addEventListener('click', exportarPDF);
+
+document.querySelectorAll('.regresarMenu').forEach(button => {
+  button.addEventListener('click', () => mostrarSeccion('menuPrincipal'));
+});
 
 function mostrarSeccion(seccion) {
   document.querySelectorAll('.container > div').forEach(div => div.classList.add('hidden'));
@@ -111,33 +114,19 @@ function actualizarTablaVerTabla() {
   });
 }
 
-function exportarExcel() {
-  const ws = XLSX.utils.json_to_sheet(listaAlumnos);
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, new Date().toLocaleDateString());
-  XLSX.writeFile(wb, `datos_${new Date().toLocaleDateString()}.xlsx`);
-}
-
-function importarExcel() {
-  const input = document.createElement('input');
-  input.type = 'file';
-  input.accept = '.xlsx';
-  input.onchange = (e) => {
-    const file = e.target.files[0];
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const data = new Uint8Array(e.target.result);
-      const workbook = XLSX.read(data, { type: 'array' });
-      const sheetName = workbook.SheetNames[0];
-      const sheet = workbook.Sheets[sheetName];
-      const json = XLSX.utils.sheet_to_json(sheet);
-      listaAlumnos = json;
-      localStorage.setItem('listaAlumnos', JSON.stringify(listaAlumnos));
-      actualizarTablaVerTabla();
-    };
-    reader.readAsArrayBuffer(file);
-  };
-  input.click();
+function exportarPDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  const fecha = new Date().toLocaleDateString();
+  doc.text(`Lista de Alumnos - ${fecha}`, 10, 10);
+  const headers = [["Alumno", "Código de Barras", "Estatus"]];
+  const data = listaAlumnos.map(item => [item.alumno, item.codigo, item.estatus]);
+  doc.autoTable({
+    head: headers,
+    body: data,
+    startY: 20,
+  });
+  doc.save(`lista_alumnos_${fecha}.pdf`);
 }
 
 function mostrarMensaje(mensaje, tipo) {
