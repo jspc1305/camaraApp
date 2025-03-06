@@ -5,40 +5,66 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Escáner de Códigos de Barras</title>
   <link rel="stylesheet" href="styles.css">
-  <!-- Librería para el escaneo (compatible con QR y códigos de barras) -->
   <script src="https://unpkg.com/html5-qrcode" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js" defer></script>
   <script src="script.js" defer></script>
 </head>
 <body>
   <div class="container">
     <h1>Escáner de Códigos de Barras</h1>
     <div class="botones">
-      <button id="iniciarEscaneo">Escanear Código</button>
-      <button id="guardarDatos">Exportar CSV</button>
+      <button id="crearLista">Crear Lista</button>
+      <button id="actualizarEstatus">Actualizar Estatus</button>
+      <button id="verTabla">Ver Tabla</button>
     </div>
-    
-    <!-- Área de cámara: al tocar esta zona se confirmará el código detectado -->
-    <div id="scanner" class="hidden"></div>
-    
-    <!-- Audio de confirmación: asegúrate de contar con beep.mp3 -->
+
+    <!-- Apartado para crear la lista -->
+    <div id="crearListaSection" class="hidden">
+      <h2>Crear Lista</h2>
+      <div id="scannerCrearLista"></div>
+      <table id="tablaCrearLista">
+        <thead>
+          <tr>
+            <th>Alumno</th>
+            <th>Código de Barras</th>
+            <th>Estatus</th>
+          </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+      <button id="guardarLista">Guardar Lista</button>
+    </div>
+
+    <!-- Apartado para actualizar el estatus -->
+    <div id="actualizarEstatusSection" class="hidden">
+      <h2>Actualizar Estatus</h2>
+      <div id="scannerActualizarEstatus"></div>
+      <div id="mensajeActualizarEstatus"></div>
+    </div>
+
+    <!-- Apartado para ver la tabla -->
+    <div id="verTablaSection" class="hidden">
+      <h2>Ver Tabla</h2>
+      <table id="tablaVerTabla">
+        <thead>
+          <tr>
+            <th>Alumno</th>
+            <th>Código de Barras</th>
+            <th>Estatus</th>
+          </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+      <div class="botones">
+        <button id="exportarExcel">Exportar a Excel</button>
+        <button id="importarExcel">Importar desde Excel</button>
+      </div>
+    </div>
+
+    <!-- Audio de confirmación -->
     <audio id="beep" src="beep.mp3"></audio>
-    
-    <!-- Mensajes de confirmación o error -->
-    <div id="mensaje"></div>
-    
-    <!-- Tabla para visualizar la lista de registros -->
-    <table id="tablaDatos">
-      <thead>
-        <tr>
-          <th>Alumno</th>
-          <th>Código de Barras</th>
-          <th>Estatus</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-      </tbody>
-    </table>
   </div>
 </body>
 </html>

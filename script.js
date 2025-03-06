@@ -1,130 +1,150 @@
-let scanner;
-let scannedData = [];      // Array que almacena los registros escaneados
-let codigoPendiente = null; // Código detectado pendiente de confirmación
+let scannerCrearLista;
+let scannerActualizarEstatus;
+let listaAlumnos = JSON.parse(localStorage.getItem('listaAlumnos')) || [];
 const beepSound = document.getElementById('beep');
-const mensajeDiv = document.getElementById('mensaje');
-const scannerDiv = document.getElementById('scanner');
+const mensajeActualizarEstatus = document.getElementById('mensajeActualizarEstatus');
 
-// Botón para iniciar el escaneo
-document.getElementById('iniciarEscaneo').addEventListener('click', () => {
-  scannerDiv.classList.remove('hidden');
-  iniciarScanner();
+document.getElementById('crearLista').addEventListener('click', () => {
+  mostrarSeccion('crearListaSection');
+  iniciarScannerCrearLista();
 });
 
-// Botón para exportar la lista a CSV
-document.getElementById('guardarDatos').addEventListener('click', () => {
-  if(scannedData.length > 0) {
-    exportarCSV();
-  } else {
-    mostrarMensaje("No hay datos para guardar.", "error");
-  }
+document.getElementById('actualizarEstatus').addEventListener('click', () => {
+  mostrarSeccion('actualizarEstatusSection');
+  iniciarScannerActualizarEstatus();
 });
 
-// Inicia el escáner utilizando la librería html5-qrcode
-function iniciarScanner() {
-  if (!scanner) {
-    scanner = new Html5QrcodeScanner("scanner", { fps: 10, qrbox: 250 });
-  }
-  scanner.render(processarCodigo);
+document.getElementById('verTabla').addEventListener('click', () => {
+  mostrarSeccion('verTablaSection');
+  actualizarTablaVerTabla();
+});
+
+document.getElementById('guardarLista').addEventListener('click', () => {
+  localStorage.setItem('listaAlumnos', JSON.stringify(listaAlumnos));
+  mostrarMensaje('Lista guardada correctamente.', 'success');
+});
+
+document.getElementById('exportarExcel').addEventListener('click', exportarExcel);
+document.getElementById('importarExcel').addEventListener('click', importarExcel);
+
+function mostrarSeccion(seccion) {
+  document.querySelectorAll('.container > div').forEach(div => div.classList.add('hidden'));
+  document.getElementById(seccion).classList.remove('hidden');
 }
 
-// Callback del escáner: se ejecuta al detectar un código
-function processarCodigo(codigo) {
-  // Si ya hay un código pendiente de confirmación, ignorar nuevos
-  if (codigoPendiente !== null) {
-    return;
+function iniciarScannerCrearLista() {
+  if (!scannerCrearLista) {
+    scannerCrearLista = new Html5QrcodeScanner("scannerCrearLista", { fps: 10, qrbox: 250 });
   }
-  // Verificar si el código ya fue registrado
-  if (scannedData.some(item => item.codigo === codigo)) {
-    mostrarMensaje(`Código ${codigo} ya fue registrado.`, "error");
-    return;
-  }
-  codigoPendiente = codigo;
-  mostrarMensaje(`Código detectado: ${codigo}. Toca la cámara para confirmar.`, "success");
+  scannerCrearLista.render((codigo) => {
+    if (!listaAlumnos.some(item => item.codigo === codigo)) {
+      listaAlumnos.push({ alumno: '', codigo: codigo, estatus: 'Faltante' });
+      actualizarTablaCrearLista();
+      beepSound.play().catch(error => console.log("Error reproduciendo beep:", error));
+    }
+  });
 }
 
-// Al tocar el área de la cámara se confirma el registro del código pendiente
-scannerDiv.addEventListener('touchend', confirmarCodigo);
-scannerDiv.addEventListener('click', confirmarCodigo);
-
-function confirmarCodigo() {
-  if (codigoPendiente !== null) {
-    scannedData.push({ alumno: "", codigo: codigoPendiente, estatus: "Entregado" });
-    // Reproduce el sonido de confirmación
-    beepSound.play().catch(error => console.log("Error reproduciendo beep:", error));
-    mostrarMensaje(`Código ${codigoPendiente} guardado.`, "success");
-    codigoPendiente = null;
-    actualizarTabla();
+function iniciarScannerActualizarEstatus() {
+  if (!scannerActualizarEstatus) {
+    scannerActualizarEstatus = new Html5QrcodeScanner("scannerActualizarEstatus", { fps: 10, qrbox: 250 });
   }
+  scannerActualizarEstatus.render((codigo) => {
+    const alumno = listaAlumnos.find(item => item.codigo === codigo);
+    if (alumno) {
+      alumno.estatus = 'Entregado';
+      localStorage.setItem('listaAlumnos', JSON.stringify(listaAlumnos));
+      mostrarMensaje(`Estatus actualizado para ${codigo}.`, 'success');
+      beepSound.play().catch(error => console.log("Error reproduciendo beep:", error));
+    } else {
+      mostrarMensaje(`Código ${codigo} no encontrado.`, 'error');
+    }
+  });
 }
 
-// Actualiza la tabla que muestra la lista de registros
-function actualizarTabla() {
-  const tbody = document.querySelector("#tablaDatos tbody");
+function actualizarTablaCrearLista() {
+  const tbody = document.querySelector("#tablaCrearLista tbody");
   tbody.innerHTML = "";
-  scannedData.forEach((record, index) => {
+  listaAlumnos.forEach((record, index) => {
     const tr = document.createElement("tr");
     tr.dataset.index = index;
-    
-    // Celda editable para "Alumno"
+
     const tdAlumno = document.createElement("td");
     tdAlumno.textContent = record.alumno;
     tdAlumno.setAttribute("contenteditable", "true");
     tdAlumno.addEventListener("blur", function() {
-      scannedData[index].alumno = this.textContent;
+      listaAlumnos[index].alumno = this.textContent;
     });
-    
-    // Celda para "Código de Barras"
+
     const tdCodigo = document.createElement("td");
     tdCodigo.textContent = record.codigo;
-    
-    // Celda para "Estatus"
+
     const tdEstatus = document.createElement("td");
     tdEstatus.textContent = record.estatus;
-    
-    // Celda para Acciones (botón eliminar)
-    const tdAcciones = document.createElement("td");
-    const btnEliminar = document.createElement("button");
-    btnEliminar.textContent = "Eliminar";
-    btnEliminar.addEventListener("click", function() {
-      scannedData.splice(index, 1);
-      actualizarTabla();
-      mostrarMensaje("Registro eliminado.", "success");
-    });
-    tdAcciones.appendChild(btnEliminar);
-    
+
     tr.appendChild(tdAlumno);
     tr.appendChild(tdCodigo);
     tr.appendChild(tdEstatus);
-    tr.appendChild(tdAcciones);
     tbody.appendChild(tr);
   });
 }
 
-// Exporta los datos a un archivo CSV para su descarga
-function exportarCSV() {
-  let csvContent = "data:text/csv;charset=utf-8,";
-  csvContent += "Alumno,Código de Barras,Estatus\r\n";
-  scannedData.forEach(record => {
-    let row = `${record.alumno},${record.codigo},${record.estatus}`;
-    csvContent += row + "\r\n";
+function actualizarTablaVerTabla() {
+  const tbody = document.querySelector("#tablaVerTabla tbody");
+  tbody.innerHTML = "";
+  listaAlumnos.forEach((record) => {
+    const tr = document.createElement("tr");
+
+    const tdAlumno = document.createElement("td");
+    tdAlumno.textContent = record.alumno;
+
+    const tdCodigo = document.createElement("td");
+    tdCodigo.textContent = record.codigo;
+
+    const tdEstatus = document.createElement("td");
+    tdEstatus.textContent = record.estatus;
+
+    tr.appendChild(tdAlumno);
+    tr.appendChild(tdCodigo);
+    tr.appendChild(tdEstatus);
+    tbody.appendChild(tr);
   });
-  const encodedUri = encodeURI(csvContent);
-  const link = document.createElement("a");
-  link.setAttribute("href", encodedUri);
-  link.setAttribute("download", "datos_escaneados.csv");
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  mostrarMensaje("Datos exportados correctamente.", "success");
 }
 
-// Muestra un mensaje temporal en la pantalla (éxito o error)
+function exportarExcel() {
+  const ws = XLSX.utils.json_to_sheet(listaAlumnos);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, new Date().toLocaleDateString());
+  XLSX.writeFile(wb, `datos_${new Date().toLocaleDateString()}.xlsx`);
+}
+
+function importarExcel() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.xlsx';
+  input.onchange = (e) => {
+    const file = e.target.files[0];
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const data = new Uint8Array(e.target.result);
+      const workbook = XLSX.read(data, { type: 'array' });
+      const sheetName = workbook.SheetNames[0];
+      const sheet = workbook.Sheets[sheetName];
+      const json = XLSX.utils.sheet_to_json(sheet);
+      listaAlumnos = json;
+      localStorage.setItem('listaAlumnos', JSON.stringify(listaAlumnos));
+      actualizarTablaVerTabla();
+    };
+    reader.readAsArrayBuffer(file);
+  };
+  input.click();
+}
+
 function mostrarMensaje(mensaje, tipo) {
-  mensajeDiv.textContent = mensaje;
-  mensajeDiv.className = tipo;
+  mensajeActualizarEstatus.textContent = mensaje;
+  mensajeActualizarEstatus.className = tipo;
   setTimeout(() => {
-    mensajeDiv.textContent = "";
-    mensajeDiv.className = "";
+    mensajeActualizarEstatus.textContent = "";
+    mensajeActualizarEstatus.className = "";
   }, 3000);
 }

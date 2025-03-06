@@ -1,92 +1,91 @@
 body {
-    font-family: Arial, sans-serif;
-    text-align: center;
-    background-color: #f4f4f4;
-    margin: 0;
-    padding: 0;
-  }
-  
-  .container {
-    width: 90%;
-    max-width: 500px;
-    margin: 20px auto;
-    padding: 20px;
-    background: #fff;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  }
-  
-  .botones {
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-  }
-  
-  button {
-    width: 48%;
-    padding: 10px;
-    margin: 10px 0;
-    border: none;
-    background: #007bff;
-    color: #fff;
-    font-size: 16px;
-    cursor: pointer;
-    border-radius: 5px;
-  }
-  
-  button:hover {
-    background: #0056b3;
-  }
-  
-  .hidden {
-    display: none;
-  }
-  
-  #scanner {
-    width: 100%;
-    margin-top: 10px;
-    border: 2px dashed #ccc;
-    border-radius: 5px;
-  }
-  
-  #mensaje {
-    margin-top: 20px;
-    font-weight: bold;
-    min-height: 24px;
-  }
-  
-  .success {
-    color: green;
-  }
-  
-  .error {
-    color: red;
-  }
-  
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-  }
-  
-  table, th, td {
-    border: 1px solid #ddd;
-  }
-  
-  th, td {
-    padding: 8px;
-    text-align: center;
-  }
-  
-  /* Botón para eliminar en la tabla */
-  table button {
-    width: auto;
-    padding: 5px 10px;
-    font-size: 14px;
-    background: #dc3545;
-  }
-  
-  table button:hover {
-    background: #b02a37;
-  }
-  
+  font-family: Arial, sans-serif;
+  text-align: center;
+  background-color: #f4f4f4;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  width: 90%;
+  max-width: 500px;
+  margin: 20px auto;
+  padding: 20px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.botones {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+button {
+  width: 48%;
+  padding: 10px;
+  margin: 10px 0;
+  border: none;
+  background: #007bff;
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+button:hover {
+  background: #0056b3;
+}
+
+.hidden {
+  display: none;
+}
+
+#scannerCrearLista, #scannerActualizarEstatus {
+  width: 100%;
+  margin-top: 10px;
+  border: 2px dashed #ccc;
+  border-radius: 5px;
+}
+
+#mensajeActualizarEstatus {
+  margin-top: 20px;
+  font-weight: bold;
+  min-height: 24px;
+}
+
+.success {
+  color: green;
+}
+
+.error {
+  color: red;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+table, th, td {
+  border: 1px solid #ddd;
+}
+
+th, td {
+  padding: 8px;
+  text-align: center;
+}
+
+/* Botón para eliminar en la tabla */
+table button {
+  width: auto;
+  padding: 5px 10px;
+  font-size: 14px;
+  background: #dc3545;
+}
+
+table button:hover {
+  background: #b02a37;
+}
