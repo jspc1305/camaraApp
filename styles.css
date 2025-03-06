@@ -113,3 +113,22 @@ th, td {
 #exportarPDF:hover {
   background: #218838;
 }
+
+select {
+  padding: 5px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+button.eliminar {
+  background: #dc3545;
+  color: #fff;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button.eliminar:hover {
+  background: #b02a37;
+}

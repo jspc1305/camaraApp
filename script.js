@@ -2,6 +2,7 @@ let scannerCrearLista;
 let scannerActualizarEstatus;
 let listaAlumnos = JSON.parse(localStorage.getItem('listaAlumnos')) || [];
 const beepSound = document.getElementById('beep');
+const errorSound = document.getElementById('error');
 const mensajeActualizarEstatus = document.getElementById('mensajeActualizarEstatus');
 
 document.getElementById('crearLista').addEventListener('click', () => {
@@ -41,7 +42,7 @@ function iniciarScannerCrearLista() {
   }
   scannerCrearLista.render((codigo) => {
     if (!listaAlumnos.some(item => item.codigo === codigo)) {
-      listaAlumnos.push({ alumno: '', codigo: codigo, estatus: 'Faltante' });
+      listaAlumnos.push({ alumno: '', codigo: codigo, materia: 'Matemáticas', estatus: 'Faltante' });
       actualizarTablaCrearLista();
       beepSound.play().catch(error => console.log("Error reproduciendo beep:", error));
     }
@@ -61,6 +62,7 @@ function iniciarScannerActualizarEstatus() {
       beepSound.play().catch(error => console.log("Error reproduciendo beep:", error));
     } else {
       mostrarMensaje(`Código ${codigo} no encontrado.`, 'error');
+      errorSound.play().catch(error => console.log("Error reproduciendo error:", error));
     }
   });
 }
@@ -82,12 +84,41 @@ function actualizarTablaCrearLista() {
     const tdCodigo = document.createElement("td");
     tdCodigo.textContent = record.codigo;
 
+    const tdMateria = document.createElement("td");
+    const selectMateria = document.createElement("select");
+    const materias = ["Matemáticas", "Español", "Geografía", "Historia"];
+    materias.forEach(materia => {
+      const option = document.createElement("option");
+      option.value = materia;
+      option.textContent = materia;
+      if (materia === record.materia) {
+        option.selected = true;
+      }
+      selectMateria.appendChild(option);
+    });
+    selectMateria.addEventListener("change", function() {
+      listaAlumnos[index].materia = this.value;
+    });
+    tdMateria.appendChild(selectMateria);
+
     const tdEstatus = document.createElement("td");
     tdEstatus.textContent = record.estatus;
 
+    const tdAcciones = document.createElement("td");
+    const btnEliminar = document.createElement("button");
+    btnEliminar.textContent = "Eliminar";
+    btnEliminar.addEventListener("click", function() {
+      listaAlumnos.splice(index, 1);
+      actualizarTablaCrearLista();
+      mostrarMensaje("Registro eliminado.", "success");
+    });
+    tdAcciones.appendChild(btnEliminar);
+
     tr.appendChild(tdAlumno);
     tr.appendChild(tdCodigo);
+    tr.appendChild(tdMateria);
     tr.appendChild(tdEstatus);
+    tr.appendChild(tdAcciones);
     tbody.appendChild(tr);
   });
 }
@@ -104,11 +135,15 @@ function actualizarTablaVerTabla() {
     const tdCodigo = document.createElement("td");
     tdCodigo.textContent = record.codigo;
 
+    const tdMateria = document.createElement("td");
+    tdMateria.textContent = record.materia;
+
     const tdEstatus = document.createElement("td");
     tdEstatus.textContent = record.estatus;
 
     tr.appendChild(tdAlumno);
     tr.appendChild(tdCodigo);
+    tr.appendChild(tdMateria);
     tr.appendChild(tdEstatus);
     tbody.appendChild(tr);
   });
@@ -119,8 +154,8 @@ function exportarPDF() {
   const doc = new jsPDF();
   const fecha = new Date().toLocaleDateString();
   doc.text(`Lista de Alumnos - ${fecha}`, 10, 10);
-  const headers = [["Alumno", "Código de Barras", "Estatus"]];
-  const data = listaAlumnos.map(item => [item.alumno, item.codigo, item.estatus]);
+  const headers = [["Alumno", "Código de Barras", "Materia", "Estatus"]];
+  const data = listaAlumnos.map(item => [item.alumno, item.codigo, item.materia, item.estatus]);
   doc.autoTable({
     head: headers,
     body: data,
